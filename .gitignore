@@ -1,0 +1,11 @@
+Debug/
+ipch/
+x64/
+MyZygo.sdf
+MyZygo.VC.db
+MyZygo/Debug/
+MyZygo/x64/
+.vs/
+MyZygo/MyZygo.aps
+
+
