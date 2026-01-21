@@ -1,5 +1,5 @@
 #pragma once
-#include "SimpleClient.h"
+#include "ZygoClient.h"
 
 #define MAX_DELAY_TCP (60*1000)
 
@@ -16,7 +16,7 @@ class CZygo : public CWnd
 
 	CWnd* m_pParent;
 	HWND m_hParent;
-	CSimpleClient *m_pClient;
+	CZygoClient *m_pClient;
 
 	BOOL m_bIsWait;
 

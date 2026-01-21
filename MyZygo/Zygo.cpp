@@ -89,7 +89,7 @@ BOOL CZygo::Send(char* pBuffer, int nLen)
 BOOL CZygo::Start(CString sSvrAddr, CString sSvrPort)
 {
 	if (!m_pClient)
-		m_pClient = new CSimpleClient(sSvrAddr, _tstoi(sSvrPort), this);
+		m_pClient = new CZygoClient(sSvrAddr, _tstoi(sSvrPort), this);
 
 	return TRUE;
 }

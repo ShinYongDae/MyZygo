@@ -1,15 +1,15 @@
-// SimpleClient.cpp : 구현 파일입니다.
+// ZygoClient.cpp : 구현 파일입니다.
 //
 
 #include "stdafx.h"
-#include "SimpleClient.h"
+#include "ZygoClient.h"
 #include "Zygo.h"
 
-// CSimpleClient
+// CZygoClient
 
-IMPLEMENT_DYNAMIC(CSimpleClient, CWnd)
+IMPLEMENT_DYNAMIC(CZygoClient, CWnd)
 
-CSimpleClient::CSimpleClient(CString sServerIp, int nPort, CWnd* pParent/*=NULL*/)
+CZygoClient::CZygoClient(CString sServerIp, int nPort, CWnd* pParent/*=NULL*/)
 {
 	m_hParent = NULL;
 	m_pParent = pParent;
@@ -59,7 +59,7 @@ CSimpleClient::CSimpleClient(CString sServerIp, int nPort, CWnd* pParent/*=NULL*
 	ThreadStart();
 }
 
-CSimpleClient::~CSimpleClient()
+CZygoClient::~CZygoClient()
 {
 	//소켓 종료
 	closesocket(clientSocket);
@@ -73,29 +73,29 @@ CSimpleClient::~CSimpleClient()
 }
 
 
-BEGIN_MESSAGE_MAP(CSimpleClient, CWnd)
+BEGIN_MESSAGE_MAP(CZygoClient, CWnd)
 END_MESSAGE_MAP()
 
 
 
-// CSimpleClient 메시지 처리기입니다.
-BOOL CSimpleClient::CreateWndForm(DWORD dwStyle)
+// CZygoClient 메시지 처리기입니다.
+BOOL CZygoClient::CreateWndForm(DWORD dwStyle)
 {
-	if (!Create(NULL, _T("SimpleClient"), dwStyle, CRect(0, 0, 0, 0), m_pParent, (UINT)this))
+	if (!Create(NULL, _T("ZygoClient"), dwStyle, CRect(0, 0, 0, 0), m_pParent, (UINT)this))
 	{
-		AfxMessageBox(_T("CSimpleClient::Create() Failed!!!"));
+		AfxMessageBox(_T("CZygoClient::Create() Failed!!!"));
 		return FALSE;
 	}
 
 	return TRUE;
 }
 
-BOOL CSimpleClient::IsConnected()
+BOOL CZygoClient::IsConnected()
 {
 	return (m_bThreadAlive && m_bConnected);
 }
 
-BOOL CSimpleClient::Send(CString sSend)
+BOOL CZygoClient::Send(CString sSend)
 {
 	int nLen = sSend.GetLength() + 1; // for '\0'
 	char* cSend = new char[nLen];
@@ -111,7 +111,7 @@ BOOL CSimpleClient::Send(CString sSend)
 	return TRUE;
 }
 
-BOOL CSimpleClient::Send(char* pBuffer)
+BOOL CZygoClient::Send(char* pBuffer)
 {
 	int retval = send(clientSocket, pBuffer, strlen(pBuffer), 0);
 	if (retval == SOCKET_ERROR)
@@ -123,7 +123,7 @@ BOOL CSimpleClient::Send(char* pBuffer)
 	return TRUE;
 }
 
-BOOL CSimpleClient::Send(char* pBuffer, int nLen)
+BOOL CZygoClient::Send(char* pBuffer, int nLen)
 {
 	int retval = send(clientSocket, pBuffer, nLen, 0);
 	if (retval == SOCKET_ERROR)
@@ -136,20 +136,20 @@ BOOL CSimpleClient::Send(char* pBuffer, int nLen)
 }
 
 
-void CSimpleClient::ProcThrd(const LPVOID lpContext)
+void CZygoClient::ProcThrd(const LPVOID lpContext)
 {
-	CSimpleClient* pSimpleClient = reinterpret_cast<CSimpleClient*>(lpContext);
+	CZygoClient* pZygoClient = reinterpret_cast<CZygoClient*>(lpContext);
 
-	while (pSimpleClient->ThreadIsAlive())
+	while (pZygoClient->ThreadIsAlive())
 	{
-		if (!pSimpleClient->ProcReceive())
+		if (!pZygoClient->ProcReceive())
 			break;
 	}
 
-	pSimpleClient->ThreadEnd();
+	pZygoClient->ThreadEnd();
 }
 
-BOOL CSimpleClient::ProcReceive()
+BOOL CZygoClient::ProcReceive()
 {
 	ClearReadBuffer();
 
@@ -204,14 +204,14 @@ BOOL CSimpleClient::ProcReceive()
 	return TRUE;
 }
 
-void CSimpleClient::ThreadStart()
+void CZygoClient::ThreadStart()
 {
 	m_bThreadStateEnd = FALSE;
 	m_bThreadAlive = TRUE;
 	t1 = std::thread(ProcThrd, this);
 }
 
-void CSimpleClient::ThreadStop()
+void CZygoClient::ThreadStop()
 {
 	m_bThreadAlive = FALSE;
 	MSG message;
@@ -234,36 +234,36 @@ void CSimpleClient::ThreadStop()
 	}
 }
 
-void CSimpleClient::ThreadEnd()
+void CZygoClient::ThreadEnd()
 {
 	m_bThreadStateEnd = TRUE;
 }
 
-BOOL CSimpleClient::ThreadIsAlive()
+BOOL CZygoClient::ThreadIsAlive()
 {
 	return m_bThreadAlive;
 }
 
-void CSimpleClient::ClearReadBuffer()
+void CZygoClient::ClearReadBuffer()
 {
 	ZeroMemory(m_pReadBuffer, sizeof(m_pReadBuffer));
 }
 
-void CSimpleClient::StringToChar(CString str, char* szStr)  // char* returned must be deleted... 
+void CZygoClient::StringToChar(CString str, char* szStr)  // char* returned must be deleted... 
 {
 	int nLen = str.GetLength();
 	strcpy(szStr, CT2A(str));
 	szStr[nLen] = _T('\0');
 }
 
-void CSimpleClient::StringToTChar(CString str, TCHAR* tszStr) // TCHAR* returned must be deleted... 
+void CZygoClient::StringToTChar(CString str, TCHAR* tszStr) // TCHAR* returned must be deleted... 
 {
 	int nLen = str.GetLength() + 1;
 	memset(tszStr, 0x00, nLen * sizeof(TCHAR));
 	_tcscpy(tszStr, str);
 }
 
-CString CSimpleClient::CharToString(char *szStr)
+CString CZygoClient::CharToString(char *szStr)
 {
 	CString strRet;
 

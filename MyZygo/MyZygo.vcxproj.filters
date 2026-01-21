@@ -39,7 +39,7 @@
     <ClInclude Include="Zygo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleClient.h">
+    <ClInclude Include="ZygoClient.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClCompile Include="Zygo.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleClient.cpp">
+    <ClCompile Include="ZygoClient.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

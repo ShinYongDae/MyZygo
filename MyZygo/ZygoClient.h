@@ -9,11 +9,11 @@
 
 #define BUFSIZE 16384
 
-// CSimpleClient
+// CZygoClient
 
-class CSimpleClient : public CWnd
+class CZygoClient : public CWnd
 {
-	DECLARE_DYNAMIC(CSimpleClient)
+	DECLARE_DYNAMIC(CZygoClient)
 
 	CWnd* m_pParent;
 	HWND m_hParent;
@@ -33,8 +33,8 @@ class CSimpleClient : public CWnd
 	void ClearReadBuffer();
 
 public:
-	CSimpleClient(CString sServerIp, int nPort, CWnd* pParent = NULL);
-	virtual ~CSimpleClient();
+	CZygoClient(CString sServerIp, int nPort, CWnd* pParent = NULL);
+	virtual ~CZygoClient();
 	
 	char* m_pReadBuffer;
 	SOCKET clientSocket;
