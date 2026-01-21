@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "SimpleClient.h"
+#include "Zygo.h"
 
 // CSimpleClient
 
@@ -122,6 +123,19 @@ BOOL CSimpleClient::Send(char* pBuffer)
 	return TRUE;
 }
 
+BOOL CSimpleClient::Send(char* pBuffer, int nLen)
+{
+	int retval = send(clientSocket, pBuffer, nLen, 0);
+	if (retval == SOCKET_ERROR)
+	{
+		m_bConnected = FALSE;
+		AfxMessageBox(_T("send() Error"));
+		return FALSE;
+	}
+	return TRUE;
+}
+
+
 void CSimpleClient::ProcThrd(const LPVOID lpContext)
 {
 	CSimpleClient* pSimpleClient = reinterpret_cast<CSimpleClient*>(lpContext);
@@ -167,16 +181,19 @@ BOOL CSimpleClient::ProcReceive()
 		nRecSize = recv(clientSocket, buffer, BUFSIZE, 0);
 		if (nRecSize > 0)
 		{
-			memcpy(readBuffer, buffer, nRecSize);
-			readBuffer[nRecSize] = _T('\0');
-			CString sMsg = CharToString(readBuffer);
-			if (m_pParent && m_hParent)
-			{
-				//CZygo* pZygo = (CZygo*)m_pParent;
-				//pZygo->wmClientReceived((WPARAM)0, (LPARAM)(LPCTSTR)sMsg);
-				//m_pParent->PostMessage(WM_CLIENT_RECEIVED, (WPARAM)0, (LPARAM)(LPCTSTR)sMsg);
-				::SendMessage(m_hParent, WM_CLIENT_RECEIVED, (WPARAM)0, (LPARAM)(LPCTSTR)sMsg);
-			}
+			((CZygo*)m_pParent)->OnDataReceived((BYTE*)buffer, nRecSize);
+			memset((BYTE*)buffer, 0, BUFSIZE);
+			//memcpy(readBuffer, buffer, nRecSize);
+			//readBuffer[nRecSize] = _T('\0');
+			//CString sMsg = CharToString(readBuffer);
+			//if (m_pParent && m_hParent)
+			//{
+			//	//CZygo* pZygo = (CZygo*)m_pParent;
+			//	//pZygo->wmClientReceived((WPARAM)0, (LPARAM)(LPCTSTR)sMsg);
+			//	//m_pParent->PostMessage(WM_CLIENT_RECEIVED, (WPARAM)0, (LPARAM)(LPCTSTR)sMsg);
+			//
+			//	::SendMessage(m_hParent, WM_CLIENT_RECEIVED, (WPARAM)0, (LPARAM)(LPCTSTR)sMsg);
+			//}
 		}
 		else if (nRecSize == 0)
 		{

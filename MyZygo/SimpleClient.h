@@ -43,6 +43,7 @@ public:
 	BOOL ProcReceive();
 	BOOL Send(CString sSend);
 	BOOL Send(char* pBuffer);
+	BOOL Send(char* pBuffer, int nLen);
 	BOOL ThreadIsAlive();
 	BOOL IsConnected();
 

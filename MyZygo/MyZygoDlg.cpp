@@ -47,7 +47,44 @@ END_MESSAGE_MAP()
 
 // CMyZygoDlg 대화 상자
 
+CString CMyZygoDlg::GetErrorDescription(CException *ex)
+{
+	CString strExceptionDescription;
+	TCHAR szException[1024] = { 0, };
 
+	if (ex->GetErrorMessage(szException, 1024))
+		strExceptionDescription = szException;
+
+	return strExceptionDescription;
+}
+
+CString CMyZygoDlg::GetDetailErrorMessage(DWORD dwErrorCode, CString strErrorDescription, CString &strFile, DWORD &dwLineNo)
+{
+	CString strErrorMessage;
+	COleDateTime datetime = COleDateTime::GetCurrentTime();
+
+	strErrorMessage.Format(
+		_T("Date Time: %s\n")
+		_T("ErrorCode: %d\n\n")
+		_T("%s\n\n")
+		_T("File: %s\n")
+		_T("Line: %d"),
+		datetime.Format(),
+		dwErrorCode,
+		strErrorDescription,
+		strFile,
+		dwLineNo);
+
+	return strErrorMessage;
+}
+
+void CMyZygoDlg::DetailErrorMessageBox(CException *ex, CString strFile, DWORD dwLineNo, UINT uMB_IconButton /*= MB_OK*/)
+{
+	CString strErrorDescription = GetErrorDescription(ex);
+	CString strDetailErrorMessage = GetDetailErrorMessage(GetLastError(), strErrorDescription, strFile, dwLineNo);
+
+	::AfxMessageBox(strDetailErrorMessage, uMB_IconButton);
+}
 
 CMyZygoDlg::CMyZygoDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_MYZYGO_DIALOG, pParent)
@@ -55,10 +92,20 @@ CMyZygoDlg::CMyZygoDlg(CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	m_pZygo = NULL;
+	m_bChkConnect = FALSE;
+	m_bDlg = FALSE;
+
+	ThreadStart();
 }
 
 CMyZygoDlg::~CMyZygoDlg()
 {
+	m_bChkConnect = FALSE;
+
+	ThreadStop();
+	t0.join();
+	t1.join();
+
 	if (m_pZygo)
 	{
 		delete m_pZygo;
@@ -77,10 +124,114 @@ BEGIN_MESSAGE_MAP(CMyZygoDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
 	ON_CBN_SELCHANGE(IDC_COMBO_ZYGO_LENS_TURRET, &CMyZygoDlg::OnSelchangeComboZygoLensTurret)
 	ON_BN_CLICKED(IDC_BUTTON_AF, &CMyZygoDlg::OnBnClickedButtonAf)
+	ON_WM_NCDESTROY()
+	ON_WM_CREATE()
+	ON_BN_CLICKED(IDC_BUTTON_HALFX, &CMyZygoDlg::OnBnClickedButtonHalfx)
+	ON_BN_CLICKED(IDC_BUTTON_1X, &CMyZygoDlg::OnBnClickedButton1x)
+	ON_BN_CLICKED(IDC_BUTTON_2X, &CMyZygoDlg::OnBnClickedButton2x)
 END_MESSAGE_MAP()
 
 
 // CMyZygoDlg 메시지 처리기
+
+void CMyZygoDlg::ProcThrd0(const LPVOID lpContext)
+{
+	CMyZygoDlg* pMyZygoDlg = reinterpret_cast<CMyZygoDlg*>(lpContext);
+
+	while (pMyZygoDlg->ThreadIsAlive())
+	{
+		if (!pMyZygoDlg->Proc0())
+			break;
+	}
+}
+
+BOOL CMyZygoDlg::Proc0()
+{
+	if (m_bChkConnect)
+	{
+		try
+		{
+			CButton* pChk0 = (CButton*)GetWndItem(IDC_CHECK_SERVER_CONNECT_STATE);
+			CButton* pChk1 = (CButton*)GetWndItem(IDC_CHECK_ZYGO_CONNECT_STATE);
+			if (m_pZygo)
+			{
+				if (pChk0)
+				{
+					if (m_pZygo->IsConnected() && m_bDlg)
+						pChk0->SetCheck(TRUE);
+					else if(m_bDlg)
+						pChk0->SetCheck(FALSE);
+				}
+
+				if (pChk1)
+				{
+					if (m_pZygo->IsConnectedMainUI() && m_bDlg)
+						pChk1->SetCheck(TRUE);
+					else if(m_bDlg)
+						pChk1->SetCheck(FALSE);
+				}
+
+				if(m_bDlg)
+					Sleep(500); //Sleep(0);
+			}
+		}
+		catch (CException *ex)
+		{
+			DetailErrorMessageBox(ex, _T(__FILE__), __LINE__, MB_ICONERROR | MB_OK);
+		}
+	}
+	else
+		Sleep(100);
+	return TRUE;
+}
+
+void CMyZygoDlg::ProcThrd1(const LPVOID lpContext)
+{
+	CMyZygoDlg* pMyZygoDlg = reinterpret_cast<CMyZygoDlg*>(lpContext);
+
+	while (pMyZygoDlg->ThreadIsAlive())
+	{
+		if (!pMyZygoDlg->Proc1())
+			break;
+	}
+}
+
+BOOL CMyZygoDlg::Proc1()
+{
+	Sleep(100);
+	return TRUE;
+}
+
+void CMyZygoDlg::ThreadStart()
+{
+	m_bThreadAlive = TRUE;
+	t0 = std::thread(ProcThrd0, this);
+	t1 = std::thread(ProcThrd1, this);
+}
+
+void CMyZygoDlg::ThreadStop()
+{
+	m_bThreadAlive = FALSE;
+	MSG message;
+	const DWORD dwTimeOut = 1000 * 60 * 3; // 3 Minute
+	DWORD dwStartTick = GetTickCount();
+	Sleep(50);
+}
+
+BOOL CMyZygoDlg::ThreadIsAlive()
+{
+	return m_bThreadAlive;
+}
+
+CWnd* CMyZygoDlg::GetWndItem(int nId)
+{
+	CWnd* pWnd = NULL;
+	if (!m_bDlg)
+		return pWnd;
+	else
+		pWnd = (m_bDlg ? GetDlgItem(nId) : NULL);
+	return (m_bDlg ? pWnd : NULL);
+}
 
 BOOL CMyZygoDlg::OnInitDialog()
 {
@@ -116,6 +267,8 @@ BOOL CMyZygoDlg::OnInitDialog()
 		m_pZygo = new CZygo(this);
 
 	InitComboTurret();
+
+	m_bChkConnect = TRUE;
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -169,6 +322,25 @@ HCURSOR CMyZygoDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+int CMyZygoDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CDialog::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  여기에 특수화된 작성 코드를 추가합니다.
+	m_bDlg = TRUE;
+
+	return 0;
+}
+
+void CMyZygoDlg::OnNcDestroy()
+{
+	CDialog::OnNcDestroy();
+
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	m_bDlg = FALSE;
+}
+
 void CMyZygoDlg::InitComboTurret()
 {
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_ZYGO_LENS_TURRET);
@@ -184,9 +356,27 @@ void CMyZygoDlg::OnSelchangeComboZygoLensTurret()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_ZYGO_LENS_TURRET);
 
-	INT32 nTypeTurret = (INT32)pCombo->GetCurSel();
+	int nTypeTurret = pCombo->GetCurSel();
 	if (m_pZygo)
-		m_pZygo->ZygoSelectTurret(nTypeTurret); // 562
+		m_pZygo->SelectTurret(nTypeTurret); // 562
+}
+
+void CMyZygoDlg::OnBnClickedButtonHalfx()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_pZygo->SelectZoom(0.5);
+}
+
+void CMyZygoDlg::OnBnClickedButton1x()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_pZygo->SelectZoom(1.0);
+}
+
+void CMyZygoDlg::OnBnClickedButton2x()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_pZygo->SelectZoom(2.0);
 }
 
 
@@ -194,3 +384,7 @@ void CMyZygoDlg::OnBnClickedButtonAf()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }
+
+
+
+

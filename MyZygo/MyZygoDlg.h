@@ -9,21 +9,40 @@
 // CMyZygoDlg 대화 상자
 class CMyZygoDlg : public CDialog
 {
+	BOOL m_bThreadAlive;// , m_bThreadStateEnd;
+	std::thread t0, t1;
+	void ThreadStart();
+	void ThreadStop();
+
 	CZygo* m_pZygo;
+	BOOL m_bChkConnect;
+	BOOL m_bDlg;
 
 	void InitComboTurret();
+	CWnd* GetWndItem(int nId);
+	CString GetErrorDescription(CException *ex);
+	CString GetDetailErrorMessage(DWORD dwErrorCode, CString strErrorDescription, CString &strFile, DWORD &dwLineNo);
+	void DetailErrorMessageBox(CException *ex, CString strFile, DWORD dwLineNo, UINT uMB_IconButton= MB_OK);
 
 // 생성입니다.
 public:
 	CMyZygoDlg(CWnd* pParent = NULL);	// 표준 생성자입니다.
 	~CMyZygoDlg();
+	static void ProcThrd0(const LPVOID lpContext);
+	static void ProcThrd1(const LPVOID lpContext);
 
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_MYZYGO_DIALOG };
 #endif
 
-	protected:
+
+protected:
+	BOOL Proc0();
+	BOOL Proc1();
+	BOOL ThreadIsAlive();
+
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
 public:
@@ -42,4 +61,9 @@ protected:
 public:
 	afx_msg void OnSelchangeComboZygoLensTurret();
 	afx_msg void OnBnClickedButtonAf();
+	afx_msg void OnNcDestroy();
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnBnClickedButtonHalfx();
+	afx_msg void OnBnClickedButton1x();
+	afx_msg void OnBnClickedButton2x();
 };
