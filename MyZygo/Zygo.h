@@ -3,6 +3,7 @@
 
 #define MAX_DELAY_TCP (60*1000)
 
+//#define ZYGO_ADDR _T("100.100.100.125")
 //#define ZYGO_ADDR _T("100.100.101.234")
 //#define ZYGO_PORT _T("10000")
 #define ZYGO_ADDR _T("127.0.0.1")
@@ -28,8 +29,10 @@ class CZygo : public CWnd
 private:
 	CString m_sReturn;
 	void PacketParsing(CPacket packet, int nSize);
-	BOOL GetReturn(BOOL bWait);
-	BOOL GetReturnBool(BOOL bWait);
+	BOOL GetReturn(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	BOOL GetReturnBool(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	double GetReturnDouble(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	CString GetReturnString(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
 
 	// for Zygo Connection ..................................................
 	void ClearReturn();
@@ -37,6 +40,11 @@ private:
 	BOOL ZygoConnected(); // 122
 	void Instrument_MoveTurret(int position); // 562
 	void Instrument_SetZoom(double nZoom); // 572
+	void Instrument_SetLightLevel(double dlightLevel); // 582
+	void Instrument_AutoLightLevel(); // 554
+	void Motion_Home(int nZygoAxis, BOOL bWait); // 811
+	double Motion_GetZPos(); // 835
+	CString Motion_MoveZ(double dPos); // 825
 
 public:
 	CZygo(CWnd* pParent = NULL, CString sSvrAddr = ZYGO_ADDR, CString sSvrPort = ZYGO_PORT);
@@ -46,8 +54,15 @@ public:
 	BOOL IsConnected();
 	BOOL IsConnectedMainUI();
 
-	void SelectTurret(int nTurret); // 562
-	void SelectZoom(double dZoom);
+	void MoveTurret(int nTurret); // 562
+	void SetZoom(double dZoom); // 572
+	void SetLightLevel(double dLightDN); // 582
+	void AutoLightLevel(); // 554
+	void HomeX(BOOL bWait); // 811 
+	void HomeY(BOOL bWait); // 811 
+	void HomeZ(BOOL bWait); // 811 
+	double GetZPos(); // 835
+	CString MoveZ(double dPos, BOOL bAbs = TRUE); // 825
 
 public:
 	void OnDataReceived(BYTE* pBuffer, DWORD dwCount);

@@ -7,7 +7,7 @@
 
 // CZygoClient
 
-IMPLEMENT_DYNAMIC(CZygoClient, CWnd)
+//IMPLEMENT_DYNAMIC(CZygoClient, CWnd)
 
 CZygoClient::CZygoClient(CString sServerIp, int nPort, CWnd* pParent/*=NULL*/)
 {
@@ -73,22 +73,22 @@ CZygoClient::~CZygoClient()
 }
 
 
-BEGIN_MESSAGE_MAP(CZygoClient, CWnd)
-END_MESSAGE_MAP()
+//BEGIN_MESSAGE_MAP(CZygoClient, CWnd)
+//END_MESSAGE_MAP()
 
 
 
 // CZygoClient 메시지 처리기입니다.
-BOOL CZygoClient::CreateWndForm(DWORD dwStyle)
-{
-	if (!Create(NULL, _T("ZygoClient"), dwStyle, CRect(0, 0, 0, 0), m_pParent, (UINT)this))
-	{
-		AfxMessageBox(_T("CZygoClient::Create() Failed!!!"));
-		return FALSE;
-	}
-
-	return TRUE;
-}
+//BOOL CZygoClient::CreateWndForm(DWORD dwStyle)
+//{
+//	if (!Create(NULL, _T("ZygoClient"), dwStyle, CRect(0, 0, 0, 0), m_pParent, (UINT)this))
+//	{
+//		AfxMessageBox(_T("CZygoClient::Create() Failed!!!"));
+//		return FALSE;
+//	}
+//
+//	return TRUE;
+//}
 
 BOOL CZygoClient::IsConnected()
 {

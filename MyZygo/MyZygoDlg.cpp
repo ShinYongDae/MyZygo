@@ -94,6 +94,10 @@ CMyZygoDlg::CMyZygoDlg(CWnd* pParent /*=NULL*/)
 	m_pZygo = NULL;
 	m_bChkConnect = FALSE;
 	m_bDlg = FALSE;
+	m_sLightDN = _T("70.0");
+
+	m_sZygoAddr = _T("");
+	m_sZygoPort = _T("");
 
 	ThreadStart();
 }
@@ -129,6 +133,11 @@ BEGIN_MESSAGE_MAP(CMyZygoDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_HALFX, &CMyZygoDlg::OnBnClickedButtonHalfx)
 	ON_BN_CLICKED(IDC_BUTTON_1X, &CMyZygoDlg::OnBnClickedButton1x)
 	ON_BN_CLICKED(IDC_BUTTON_2X, &CMyZygoDlg::OnBnClickedButton2x)
+	ON_BN_CLICKED(IDC_BUTTON_MANUAL_CHANGE, &CMyZygoDlg::OnBnClickedButtonManualChange)
+	ON_BN_CLICKED(IDC_BUTTON_AUTOLIGHT, &CMyZygoDlg::OnBnClickedButtonAutolight)
+	ON_BN_CLICKED(IDC_BUTTON_START_MEASURE, &CMyZygoDlg::OnBnClickedButtonStartMeasure)
+	ON_BN_CLICKED(IDC_BUTTON_HOMMING, &CMyZygoDlg::OnBnClickedButtonHomming)
+	ON_BN_CLICKED(IDC_BUTTON_GO_POS, &CMyZygoDlg::OnBnClickedButtonGoPos)
 END_MESSAGE_MAP()
 
 
@@ -263,10 +272,17 @@ BOOL CMyZygoDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
-	if(!m_pZygo)
-		m_pZygo = new CZygo(this);
+	LoadConfig();
 
-	InitComboTurret();
+	if (!m_pZygo)
+	{
+		if (m_sZygoAddr.IsEmpty() || m_sZygoPort.IsEmpty())
+			m_pZygo = new CZygo(this);
+		else
+			m_pZygo = new CZygo(this, m_sZygoAddr, m_sZygoPort);
+	}
+
+	InitDlg();
 
 	m_bChkConnect = TRUE;
 
@@ -339,6 +355,23 @@ void CMyZygoDlg::OnNcDestroy()
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	m_bDlg = FALSE;
+	Sleep(100);
+}
+
+void CMyZygoDlg::LoadConfig()
+{
+	CString sPath = _T("../Config/Init.ini");
+	TCHAR szData[MAX_PATH];
+	if (0 < ::GetPrivateProfileString(_T("TcpIp"), _T("Address"), NULL, szData, sizeof(szData), sPath))
+		m_sZygoAddr = CString(szData);
+	if (0 < ::GetPrivateProfileString(_T("TcpIp"), _T("Port"), NULL, szData, sizeof(szData), sPath))
+		m_sZygoPort = CString(szData);
+}
+
+void CMyZygoDlg::InitDlg()
+{
+	GetDlgItem(IDC_EDIT_LIGHT_LEVEL)->SetWindowText(m_sLightDN);
+	InitComboTurret();
 }
 
 void CMyZygoDlg::InitComboTurret()
@@ -358,33 +391,65 @@ void CMyZygoDlg::OnSelchangeComboZygoLensTurret()
 
 	int nTypeTurret = pCombo->GetCurSel();
 	if (m_pZygo)
-		m_pZygo->SelectTurret(nTypeTurret); // 562
+		m_pZygo->MoveTurret(nTypeTurret); // 562
 }
 
 void CMyZygoDlg::OnBnClickedButtonHalfx()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_pZygo->SelectZoom(0.5);
+	m_pZygo->SetZoom(0.5); // 572
 }
 
 void CMyZygoDlg::OnBnClickedButton1x()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_pZygo->SelectZoom(1.0);
+	m_pZygo->SetZoom(1.0); // 572
 }
 
 void CMyZygoDlg::OnBnClickedButton2x()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_pZygo->SelectZoom(2.0);
+	m_pZygo->SetZoom(2.0); // 572
 }
 
+void CMyZygoDlg::OnBnClickedButtonManualChange()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString strLightDN;
+	GetDlgItem(IDC_EDIT_LIGHT_LEVEL)->GetWindowText(strLightDN);
+	double dLightDN = _ttof(strLightDN);
+	m_pZygo->SetLightLevel(dLightDN);
+}
 
-void CMyZygoDlg::OnBnClickedButtonAf()
+void CMyZygoDlg::OnBnClickedButtonAutolight()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_pZygo->AutoLightLevel();
+}
+
+void CMyZygoDlg::OnBnClickedButtonStartMeasure()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 }
 
+void CMyZygoDlg::OnBnClickedButtonHomming()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_pZygo->HomeZ(TRUE); // 811 
+}
 
+void CMyZygoDlg::OnBnClickedButtonAf()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	double dPosZ = m_pZygo->GetZPos(); // 835
+}
 
-
+void CMyZygoDlg::OnBnClickedButtonGoPos()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	BOOL bABS = ((CButton*)GetDlgItem(IDC_CHECK_MOVING_ABS))->GetCheck();
+	CString sPos;
+	GetDlgItem(IDC_EDIT_MOVE_POS)->GetWindowText(sPos);
+	double dPos = _ttof(sPos);
+	CString sReturn = m_pZygo->MoveZ(dPos, bABS); // 825
+}

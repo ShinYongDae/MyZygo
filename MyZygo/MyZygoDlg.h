@@ -17,12 +17,17 @@ class CMyZygoDlg : public CDialog
 	CZygo* m_pZygo;
 	BOOL m_bChkConnect;
 	BOOL m_bDlg;
+	CString m_sLightDN;
 
+	void InitDlg();
 	void InitComboTurret();
 	CWnd* GetWndItem(int nId);
 	CString GetErrorDescription(CException *ex);
 	CString GetDetailErrorMessage(DWORD dwErrorCode, CString strErrorDescription, CString &strFile, DWORD &dwLineNo);
 	void DetailErrorMessageBox(CException *ex, CString strFile, DWORD dwLineNo, UINT uMB_IconButton= MB_OK);
+
+	CString m_sZygoAddr, m_sZygoPort;
+	void LoadConfig();
 
 // 생성입니다.
 public:
@@ -66,4 +71,9 @@ public:
 	afx_msg void OnBnClickedButtonHalfx();
 	afx_msg void OnBnClickedButton1x();
 	afx_msg void OnBnClickedButton2x();
+	afx_msg void OnBnClickedButtonManualChange();
+	afx_msg void OnBnClickedButtonAutolight();
+	afx_msg void OnBnClickedButtonStartMeasure();
+	afx_msg void OnBnClickedButtonHomming();
+	afx_msg void OnBnClickedButtonGoPos();
 };

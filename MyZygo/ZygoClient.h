@@ -10,10 +10,9 @@
 #define BUFSIZE 16384
 
 // CZygoClient
-
-class CZygoClient : public CWnd
+class CZygoClient// : public CWnd
 {
-	DECLARE_DYNAMIC(CZygoClient)
+	//DECLARE_DYNAMIC(CZygoClient)
 
 	CWnd* m_pParent;
 	HWND m_hParent;
@@ -23,7 +22,7 @@ class CZygoClient : public CWnd
 
 	BOOL m_bConnected;
 
-	BOOL CreateWndForm(DWORD dwStyle);
+	//BOOL CreateWndForm(DWORD dwStyle);
 
 	void StringToChar(CString str, char* szStr);
 	void StringToTChar(CString str, TCHAR* tszStr);
@@ -51,7 +50,7 @@ protected:
 	void ThreadEnd();
 
 protected:
-	DECLARE_MESSAGE_MAP()
+	//DECLARE_MESSAGE_MAP()
 };
 
 

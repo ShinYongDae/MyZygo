@@ -121,6 +121,7 @@ void CZygo::PacketParsing(CPacket packet, int nSize)
 	CString sTabs, sPanels, sGroups, /*sContainers,*/ sControls;
 	CString sName, sResult, sReturn, sId, sPath;
 	BOOL bReturn, bWait;
+	double dReturn;
 
 	//통신에 따른 구동 개시
 	switch (nClass)
@@ -940,6 +941,8 @@ void CZygo::PacketParsing(CPacket packet, int nSize)
 				break;
 			case 5: // public double GetZPos(Unit unit);
 				//double dPosMoveZ = Motion_GetZPos(); // 835
+				packet >> dReturn;
+				m_sReturn.Format(_T("%0.6f"), dReturn);
 				break;
 			case 6: // public double GetZPos(string unit);
 				break;
@@ -1333,6 +1336,7 @@ BOOL CZygo::GetReturn(BOOL bWait)
 	}
 	return FALSE;
 }
+
 BOOL CZygo::GetReturnBool(BOOL bWait)
 {
 	if (!bWait)	return TRUE;
@@ -1341,6 +1345,26 @@ BOOL CZygo::GetReturnBool(BOOL bWait)
 	if(GetReturn(bWait))
 		bRtn = _ttoi(m_sReturn) ? TRUE : FALSE;
 	return bRtn;
+}
+
+CString CZygo::GetReturnString(BOOL bWait)
+{
+	CString sRtn = _T("");
+	if (!bWait)	return sRtn;
+
+	if (GetReturn(bWait))
+		sRtn = m_sReturn;
+	return sRtn;
+}
+
+double CZygo::GetReturnDouble(BOOL bWait)
+{
+	double dRtn = 0.0;
+	if (!bWait)	return dRtn;
+
+	if (GetReturn(bWait))
+		dRtn = _ttof(m_sReturn);
+	return dRtn;
 }
 
 BOOL CZygo::IsConnected()
@@ -1366,8 +1390,18 @@ BOOL CZygo::IsConnectedMainUI()
 	return bRtn;
 }
 
-
-void CZygo::SelectTurret(int nTurret) // 562
+void CZygo::AutoLightLevel() // 554
+{
+	if (IsConnected())
+	{
+		Instrument_AutoLightLevel(); // 554
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+}
+void CZygo::MoveTurret(int nTurret) // 562
 {
 	//서버 정상 여부 확인
 	if (IsConnected())
@@ -1380,16 +1414,102 @@ void CZygo::SelectTurret(int nTurret) // 562
 	}
 }
 
-void CZygo::SelectZoom(double dZoom)
+void CZygo::SetZoom(double dZoom) // 572
 {
 	if (IsConnected())
 	{
-		Instrument_SetZoom(dZoom);
+		Instrument_SetZoom(dZoom); // 572
 	}
 	else
 	{
 		AfxMessageBox(_T("Zygo not Connected."));
 	}
+}
+
+void CZygo::SetLightLevel(double dlightLevel) // 582
+{
+	if (IsConnected())
+	{
+		Instrument_SetLightLevel(dlightLevel); // 582
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+}
+
+void CZygo::HomeX(BOOL bWait) // 811 
+{
+	if (IsConnected())
+	{
+		Motion_Home(1, bWait); // 811
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+}
+
+void CZygo::HomeY(BOOL bWait) // 811 
+{
+	if (IsConnected())
+	{
+		Motion_Home(2, bWait); // 811
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+}
+
+void CZygo::HomeZ(BOOL bWait) // 811 
+{
+	if (IsConnected())
+	{
+		Motion_Home(3, bWait); // 811
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+}
+
+double CZygo::GetZPos() // 835
+{
+	double dPosZ = 0.0;
+	if (IsConnected())
+	{
+		dPosZ = Motion_GetZPos(); // 811
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+	return dPosZ;
+}
+
+CString CZygo::MoveZ(double dPos, BOOL bAbs) // 825
+{
+	CString sReturn = _T("");
+	double dPosZ = 0.0;
+	if (IsConnected())
+	{
+		if (bAbs)
+		{
+			sReturn = Motion_MoveZ(dPos); // 825
+		}
+		else
+		{
+			double dPosZcurr = Motion_GetZPos(); // 811
+			double dPosZdest = dPosZcurr + dPos;
+			sReturn = Motion_MoveZ(dPosZdest); // 825
+		}
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+	return sReturn;
 }
 
 // for Zygo Connection ..................................................
@@ -1407,31 +1527,87 @@ BOOL CZygo::IsReturn()
 
 BOOL CZygo::ZygoConnected() // 122
 {
-	BOOL bRtn = FALSE;
+	ClearReturn();
 	CPacket packet;
 	packet << (byte)1; packet << (byte)2; packet << (byte)2;
 	packet << (byte)0; // NULL(for end)
-	ClearReturn();
 	int nLen = 4 * sizeof(byte);
-	bRtn = GetReturnBool(Send((char*)packet.GetData(), nLen));
+	BOOL bRtn = GetReturnBool(Send((char*)packet.GetData(), nLen));
 	return bRtn;
+}
+
+void CZygo::Instrument_AutoLightLevel() // 554
+{
+	ClearReturn();
+	CPacket packet;
+	packet << (byte)5; packet << (byte)5; packet << (byte)4;
+	packet << (byte)0; // NULL(for end)
+	int nLen = 4 * sizeof(byte);
+	Send((char*)packet.GetData(), nLen);
 }
 
 void CZygo::Instrument_MoveTurret(int position) // 562
 {
-	INT32 nTurret = (INT32)position;
+	ClearReturn();
+	INT32 _nTurret = (INT32)position;
 	CPacket packet;
 	packet << (byte)5; packet << (byte)6; packet << (byte)2;
-	packet << nTurret; packet << (byte)0; // NULL(for end)
+	packet << _nTurret; packet << (byte)0; // NULL(for end)
 	int nLen = 4 * sizeof(byte) + 1 * sizeof(INT32);
 	Send((char*)packet.GetData(), nLen);
 }
 
 void CZygo::Instrument_SetZoom(double dZoom) // 572
 {
+	ClearReturn();
 	CPacket packet;
 	packet << (byte)5; packet << (byte)7; packet << (byte)2;
 	packet << dZoom; packet << (byte)0; // NULL(for end)
 	int nLen = 4 * sizeof(byte) + 1 * sizeof(double);
 	Send((char*)packet.GetData(), nLen);
 }
+
+void CZygo::Instrument_SetLightLevel(double dlightLevel) // 582
+{
+	ClearReturn();
+	CPacket packet;
+	packet << (byte)5; packet << (byte)8; packet << (byte)2;
+	packet << dlightLevel; packet << (byte)0; // NULL(for end)
+	int nLen = 4 * sizeof(byte) + 1 * sizeof(double);
+	Send((char*)packet.GetData(), nLen);
+}
+
+void CZygo::Motion_Home(int nZygoAxis, BOOL bWait) // 811
+{
+	ClearReturn();
+	INT32 _nZygoAxis = (INT32)nZygoAxis;
+	byte _wait = bWait ? (byte)1 : (byte)0;
+	CPacket packet;
+	packet << (byte)8; packet << (byte)1; packet << (byte)1;
+	packet << _nZygoAxis; packet << _wait; packet << (byte)0; // NULL(for end)
+	int nLen = 5 * sizeof(byte) + 1 * sizeof(INT32);
+	Send((char*)packet.GetData(), nLen);
+}
+
+double CZygo::Motion_GetZPos() // 835
+{
+	ClearReturn();
+	CPacket packet;
+	packet << (byte)8; packet << (byte)3; packet << (byte)5;
+	packet << (byte)0; // NULL(for end)
+	int nLen = 4 * sizeof(byte) + 1 * sizeof(INT32);
+	double dPosZ = GetReturnDouble(Send((char*)packet.GetData(), nLen));
+	return dPosZ;
+}
+
+CString CZygo::Motion_MoveZ(double dPos) // 825
+{
+	ClearReturn();
+	CPacket packet;
+	packet << (byte)8; packet << (byte)2; packet << (byte)5;
+	packet << dPos; packet << (byte)0; // NULL(for end)
+	int nLen = 4 * sizeof(byte) + 1 * sizeof(double);
+	CString sRtn = GetReturnString(Send((char*)packet.GetData(), nLen));
+	return sRtn;
+}
+
