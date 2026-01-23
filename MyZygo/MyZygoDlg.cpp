@@ -355,7 +355,7 @@ void CMyZygoDlg::OnNcDestroy()
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	m_bDlg = FALSE;
-	Sleep(100);
+	Sleep(300);
 }
 
 void CMyZygoDlg::LoadConfig()

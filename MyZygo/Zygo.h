@@ -42,9 +42,11 @@ private:
 	void Instrument_SetZoom(double nZoom); // 572
 	void Instrument_SetLightLevel(double dlightLevel); // 582
 	void Instrument_AutoLightLevel(); // 554
+	double Instrument_GetLightLevel(); // 581
 	void Motion_Home(int nZygoAxis, BOOL bWait); // 811
 	double Motion_GetZPos(); // 835
 	CString Motion_MoveZ(double dPos); // 825
+	double GetLightLevel(); // 581
 
 public:
 	CZygo(CWnd* pParent = NULL, CString sSvrAddr = ZYGO_ADDR, CString sSvrPort = ZYGO_PORT);

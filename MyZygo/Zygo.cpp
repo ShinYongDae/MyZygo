@@ -122,6 +122,7 @@ void CZygo::PacketParsing(CPacket packet, int nSize)
 	CString sName, sResult, sReturn, sId, sPath;
 	BOOL bReturn, bWait;
 	double dReturn;
+	std::string sBuffer;
 
 	//통신에 따른 구동 개시
 	switch (nClass)
@@ -899,6 +900,8 @@ void CZygo::PacketParsing(CPacket packet, int nSize)
 				//packetData = SplitPacket(packetData, sizeof(double), arraySize);
 				//bool bMoveZWait = GetPacketBool(packetData);
 				//sResult = Motion_MoveZ(dPosMoveZ, bMoveZWait); // 825
+				packet >> sBuffer;
+				m_sReturn = sBuffer.c_str();
 				break;
 			case 6: // public string MoveZ(double zPosition, string unit, bool wait);
 				break;
@@ -1390,6 +1393,20 @@ BOOL CZygo::IsConnectedMainUI()
 	return bRtn;
 }
 
+double CZygo::GetLightLevel()
+{
+	double dRtn = 0.0;
+	if (IsConnected())
+	{
+		dRtn = Instrument_GetLightLevel(); // 581
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected.\r\n"));
+	}
+	return dRtn;
+}
+
 void CZygo::AutoLightLevel() // 554
 {
 	if (IsConnected())
@@ -1544,6 +1561,17 @@ void CZygo::Instrument_AutoLightLevel() // 554
 	packet << (byte)0; // NULL(for end)
 	int nLen = 4 * sizeof(byte);
 	Send((char*)packet.GetData(), nLen);
+}
+
+double CZygo::Instrument_GetLightLevel() // 581
+{
+	ClearReturn();
+	CPacket packet;
+	packet << (byte)5; packet << (byte)8; packet << (byte)1;
+	packet << (byte)0; // NULL(for end)
+	int nLen = 4 * sizeof(byte);
+	double dLightLevel = GetReturnDouble(Send((char*)packet.GetData(), nLen));
+	return dLightLevel;
 }
 
 void CZygo::Instrument_MoveTurret(int position) // 562
