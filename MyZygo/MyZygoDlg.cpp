@@ -99,6 +99,10 @@ CMyZygoDlg::CMyZygoDlg(CWnd* pParent /*=NULL*/)
 	m_sZygoAddr = _T("");
 	m_sZygoPort = _T("");
 
+	m_dZHomePos = 0.0;
+	m_dZStopPos = 0.0;
+	m_dZMesurePos = 0.0;
+
 	ThreadStart();
 }
 
@@ -160,29 +164,10 @@ BOOL CMyZygoDlg::Proc0()
 	{
 		try
 		{
-			CButton* pChk0 = (CButton*)GetWndItem(IDC_CHECK_SERVER_CONNECT_STATE);
-			CButton* pChk1 = (CButton*)GetWndItem(IDC_CHECK_ZYGO_CONNECT_STATE);
-			if (m_pZygo)
-			{
-				if (pChk0)
-				{
-					if (m_pZygo->IsConnected() && m_bDlg)
-						pChk0->SetCheck(TRUE);
-					else if(m_bDlg)
-						pChk0->SetCheck(FALSE);
-				}
-
-				if (pChk1)
-				{
-					if (m_pZygo->IsConnectedMainUI() && m_bDlg)
-						pChk1->SetCheck(TRUE);
-					else if(m_bDlg)
-						pChk1->SetCheck(FALSE);
-				}
-
-				if(m_bDlg)
-					Sleep(500); //Sleep(0);
-			}
+			if (m_bDlg)
+				CheckZygoStatus();
+			if (m_bDlg)
+				Sleep(CHECK_DELAY_ZYGO_STATUS); //CheckZygoStatus(); 의 주기를 설정함.
 		}
 		catch (CException *ex)
 		{
@@ -355,7 +340,7 @@ void CMyZygoDlg::OnNcDestroy()
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	m_bDlg = FALSE;
-	Sleep(300);
+	Sleep(CHECK_DELAY_ZYGO_STATUS+100);
 }
 
 void CMyZygoDlg::LoadConfig()
@@ -382,6 +367,81 @@ void CMyZygoDlg::InitComboTurret()
 	pCombo->InsertString(2, _T("50X"));
 	pCombo->InsertString(3, _T("UnUsed2"));
 	pCombo->SetCurSel(-1); // Select None 
+}
+
+void CMyZygoDlg::CheckZygoStatus()
+{
+	BOOL bConnectedServer = FALSE, bConnectedZygo = FALSE;
+	CString sRtn = _T("");
+	CButton* pChk0 = (CButton*)GetWndItem(IDC_CHECK_SERVER_CONNECT_STATE);
+	CButton* pChk1 = (CButton*)GetWndItem(IDC_CHECK_ZYGO_CONNECT_STATE);
+	CStatic* pText0 = (CStatic*)GetWndItem(IDC_TEXT_LIGHT_LEVEL);
+	CStatic* pText1 = (CStatic*)GetWndItem(IDC_TEXT_HOME_POS);
+	CStatic* pText2 = (CStatic*)GetWndItem(IDC_TEXT_Z_STOP_POS);
+	CStatic* pText3 = (CStatic*)GetWndItem(IDC_TEXT_MEASURE_POS);
+
+	if (m_pZygo)
+	{
+		if (pChk0)
+		{
+			if (m_bDlg && (bConnectedServer = m_pZygo->IsConnected()))
+				if (m_bDlg) pChk0->SetCheck(TRUE);
+			else if (m_bDlg) pChk0->SetCheck(FALSE);
+				
+		}
+
+		if (pChk1)
+		{
+			if (m_bDlg && (bConnectedZygo = m_pZygo->IsConnectedMainUI())) // 122
+				if (m_bDlg) pChk1->SetCheck(TRUE);
+			else if (m_bDlg) pChk1->SetCheck(FALSE);
+				
+		}
+
+		if (pText0)
+		{
+			if (m_bDlg && bConnectedZygo)
+			{
+				double dVal = m_pZygo->GetLightLevel(); // 581
+				sRtn.Format(_T("%f", dVal));
+				if (m_bDlg) pText0->SetWindowText(sRtn);
+			}
+			else if (m_bDlg) pText0->SetWindowTextW(_T(""));
+		}
+
+		if (pText1)
+		{
+			if (m_bDlg && bConnectedZygo)
+			{
+				double dVal = m_dZHomePos; // 835
+				sRtn.Format(_T("%f", dVal));
+				if (m_bDlg) pText1->SetWindowText(sRtn);
+			}
+			else if (m_bDlg) pText1->SetWindowTextW(_T(""));
+		}
+
+		if (pText2)
+		{
+			if (m_bDlg && bConnectedZygo)
+			{
+				double dVal = m_dZStopPos; // 835
+				sRtn.Format(_T("%f", dVal));
+				if (m_bDlg) pText2->SetWindowText(sRtn);
+			}
+			else if (m_bDlg) pText2->SetWindowTextW(_T(""));
+		}
+
+		if (pText3)
+		{
+			if (m_bDlg && bConnectedZygo)
+			{
+				double dVal = m_dZMesurePos; // 835
+				sRtn.Format(_T("%f", dVal));
+				if (m_bDlg) pText3->SetWindowText(sRtn);
+			}
+			else if (m_bDlg) pText3->SetWindowTextW(_T(""));
+		}
+	}
 }
 
 void CMyZygoDlg::OnSelchangeComboZygoLensTurret()
@@ -430,18 +490,21 @@ void CMyZygoDlg::OnBnClickedButtonAutolight()
 void CMyZygoDlg::OnBnClickedButtonStartMeasure()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_dZMesurePos = m_pZygo->GetZPos(); // 835
+	m_pZygo->AutoFocus();
 }
 
 void CMyZygoDlg::OnBnClickedButtonHomming()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_pZygo->HomeZ(TRUE); // 811 
+	m_dZHomePos = m_dZStopPos = m_pZygo->GetZPos(); // 835
 }
 
 void CMyZygoDlg::OnBnClickedButtonAf()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	double dPosZ = m_pZygo->GetZPos(); // 835
+	m_dZStopPos = m_pZygo->GetZPos(); // 835
 }
 
 void CMyZygoDlg::OnBnClickedButtonGoPos()
@@ -452,4 +515,5 @@ void CMyZygoDlg::OnBnClickedButtonGoPos()
 	GetDlgItem(IDC_EDIT_MOVE_POS)->GetWindowText(sPos);
 	double dPos = _ttof(sPos);
 	CString sReturn = m_pZygo->MoveZ(dPos, bABS); // 825
+	m_dZStopPos = m_pZygo->GetZPos(); // 835
 }

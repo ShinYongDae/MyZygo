@@ -995,6 +995,9 @@ void CZygo::PacketParsing(CPacket packet, int nSize)
 			{
 			case 1: // public bool IsZStopSet();
 				//bool bStop = Motion_IsZStopSet();    // 871
+				packet >> nByte;
+				bReturn = nByte ? TRUE : FALSE;
+				m_sReturn.Format(_T("%d"), bReturn ? 1 : 0);
 				break;
 			}
 			break;
@@ -1379,7 +1382,7 @@ BOOL CZygo::IsConnected()
 	return FALSE;
 }
 
-BOOL CZygo::IsConnectedMainUI()
+BOOL CZygo::IsConnectedMainUI() // 122
 {
 	BOOL bRtn = FALSE;
 	if (IsConnected())
@@ -1407,6 +1410,18 @@ double CZygo::GetLightLevel()
 	return dRtn;
 }
 
+void CZygo::AutoFocus() // 551
+{
+	if (IsConnected())
+	{
+		Instrument_AutoFocus(); // 551
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+}
+
 void CZygo::AutoLightLevel() // 554
 {
 	if (IsConnected())
@@ -1418,6 +1433,7 @@ void CZygo::AutoLightLevel() // 554
 		AfxMessageBox(_T("Zygo not Connected."));
 	}
 }
+
 void CZygo::MoveTurret(int nTurret) // 562
 {
 	//서버 정상 여부 확인
@@ -1529,6 +1545,20 @@ CString CZygo::MoveZ(double dPos, BOOL bAbs) // 825
 	return sReturn;
 }
 
+BOOL CZygo::IsZStopSet()    // 871
+{
+	BOOL bStop = FALSE;
+	if (IsConnected())
+	{
+		bStop = Motion_IsZStopSet(); // 871
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+	return bStop;
+}
+
 // for Zygo Connection ..................................................
 void CZygo::ClearReturn()
 {
@@ -1572,6 +1602,16 @@ double CZygo::Instrument_GetLightLevel() // 581
 	int nLen = 4 * sizeof(byte);
 	double dLightLevel = GetReturnDouble(Send((char*)packet.GetData(), nLen));
 	return dLightLevel;
+}
+
+void CZygo::Instrument_AutoFocus() // 551
+{
+	ClearReturn();
+	CPacket packet;
+	packet << (byte)5; packet << (byte)5; packet << (byte)1;
+	packet << (byte)0; // NULL(for end)
+	int nLen = 4 * sizeof(byte);
+	Send((char*)packet.GetData(), nLen);
 }
 
 void CZygo::Instrument_MoveTurret(int position) // 562
@@ -1637,5 +1677,16 @@ CString CZygo::Motion_MoveZ(double dPos) // 825
 	int nLen = 4 * sizeof(byte) + 1 * sizeof(double);
 	CString sRtn = GetReturnString(Send((char*)packet.GetData(), nLen));
 	return sRtn;
+}
+
+BOOL CZygo::Motion_IsZStopSet() // 871
+{
+	ClearReturn();
+	CPacket packet;
+	packet << (byte)8; packet << (byte)7; packet << (byte)1;
+	packet << (byte)0; // NULL(for end)
+	int nLen = 4 * sizeof(byte);
+	BOOL bRtn = GetReturnBool(Send((char*)packet.GetData(), nLen));
+	return bRtn;
 }
 

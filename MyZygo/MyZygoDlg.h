@@ -5,6 +5,7 @@
 #pragma once
 #include "Zygo.h"
 
+#define CHECK_DELAY_ZYGO_STATUS		500
 
 // CMyZygoDlg 대화 상자
 class CMyZygoDlg : public CDialog
@@ -27,7 +28,9 @@ class CMyZygoDlg : public CDialog
 	void DetailErrorMessageBox(CException *ex, CString strFile, DWORD dwLineNo, UINT uMB_IconButton= MB_OK);
 
 	CString m_sZygoAddr, m_sZygoPort;
+	double m_dZHomePos, m_dZStopPos, m_dZMesurePos;
 	void LoadConfig();
+	void CheckZygoStatus();
 
 // 생성입니다.
 public:
