@@ -122,7 +122,7 @@ void CZygo::PacketParsing(CPacket packet, int nSize)
 	CString sName, sResult, sReturn, sId, sPath;
 	BOOL bReturn, bWait;
 	double dReturn;
-	std::string sBuffer;
+	std::string sBuffer = "";
 
 	//통신에 따른 구동 개시
 	switch (nClass)
@@ -500,6 +500,8 @@ void CZygo::PacketParsing(CPacket packet, int nSize)
 			case 2: // public string Measure(bool wait = true);
 				//bWait = GetPacketBool(packetData);
 				//sReturn = Instrument_Measure(bWait); // 532
+				packet >> sBuffer;
+				m_sReturn = sBuffer.c_str();
 				break;
 			case 3: // public int[][] AcquireFrame(int align_view);
 				break;
@@ -1410,6 +1412,20 @@ double CZygo::GetLightLevel()
 	return dRtn;
 }
 
+CString CZygo::Measure(BOOL bWait) // 532
+{
+	CString sReturn = _T("");
+	if (IsConnected())
+	{
+		sReturn = Instrument_Measure(bWait); // 532
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+	return sReturn;
+}
+
 void CZygo::AutoFocus() // 551
 {
 	if (IsConnected())
@@ -1602,6 +1618,18 @@ double CZygo::Instrument_GetLightLevel() // 581
 	int nLen = 4 * sizeof(byte);
 	double dLightLevel = GetReturnDouble(Send((char*)packet.GetData(), nLen));
 	return dLightLevel;
+}
+
+CString CZygo::Instrument_Measure(BOOL bWait) // 532
+{
+	ClearReturn();
+	byte _wait = bWait ? (byte)1 : (byte)0;
+	CPacket packet;
+	packet << (byte)5; packet << (byte)3; packet << (byte)2;
+	packet << _wait; packet << (byte)0; // NULL(for end)
+	int nLen = 5 * sizeof(byte);
+	CString sRtn = GetReturnString(Send((char*)packet.GetData(), nLen));
+	return sRtn;
 }
 
 void CZygo::Instrument_AutoFocus() // 551

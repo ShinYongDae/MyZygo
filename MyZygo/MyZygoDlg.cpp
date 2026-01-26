@@ -490,8 +490,20 @@ void CMyZygoDlg::OnBnClickedButtonAutolight()
 void CMyZygoDlg::OnBnClickedButtonStartMeasure()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_dZMesurePos = m_pZygo->GetZPos(); // 835
-	m_pZygo->AutoFocus();
+	if (m_pZygo->IsZStopSet())
+	{
+		CString sRtn = m_pZygo->Measure(TRUE); // 532
+		if (sRtn.IsEmpty())
+		{
+			AfxMessageBox(_T("Measure Failed."));
+		}
+		else
+		{
+			AfxMessageBox(_T("Measure Completed."));
+		}
+		//m_dZMesurePos = m_pZygo->GetZPos(); // 835
+		//m_pZygo->AutoFocus(); // 551
+	}
 }
 
 void CMyZygoDlg::OnBnClickedButtonHomming()

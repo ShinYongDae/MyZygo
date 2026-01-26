@@ -39,6 +39,7 @@ private:
 	BOOL IsReturn();
 
 	BOOL ZygoConnected(); // 122
+	CString Instrument_Measure(BOOL bWait); // 532
 	void Instrument_AutoFocus(); // 551
 	void Instrument_MoveTurret(int position); // 562
 	void Instrument_SetZoom(double nZoom); // 572
@@ -58,6 +59,7 @@ public:
 	BOOL IsConnected();
 
 	BOOL IsConnectedMainUI();  // 122
+	CString Measure(BOOL bWait); // 532
 	void AutoFocus(); // 551
 	void MoveTurret(int nTurret); // 562
 	void SetZoom(double dZoom); // 572
