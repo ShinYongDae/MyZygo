@@ -1,7 +1,7 @@
 #pragma once
-#include "ZygoClient.h"
+#include "ZygoMxClient.h"
 
-#define MAX_DELAY_TCP (60*1000)
+//#define MAX_DELAY_TCP (60*1000)
 
 //#define ZYGO_ADDR _T("100.100.100.125")
 //#define ZYGO_ADDR _T("100.100.101.234")
@@ -17,7 +17,7 @@ class CZygo : public CWnd
 
 	CWnd* m_pParent;
 	HWND m_hParent;
-	CZygoClient *m_pClient;
+	CZygoMxClient *m_pClient;
 
 	BOOL m_bIsWait;
 
@@ -27,35 +27,23 @@ class CZygo : public CWnd
 	BOOL Send(char* pBuffer, int nLen);
 
 private:
-	CString m_sReturn;
-	void PacketParsing(CPacket packet, int nSize);
-	BOOL GetReturn(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
-	BOOL GetReturnBool(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
-	double GetReturnDouble(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
-	CString GetReturnString(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	//CString m_sReturn;
+	//void PacketParsing(CPacket packet, int nSize);
+	//BOOL GetReturn(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	//BOOL GetReturnBool(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	//double GetReturnDouble(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	//CString GetReturnString(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
 
 	// for Zygo Connection ..................................................
-	void ClearReturn();
-	BOOL IsReturn();
-
-	BOOL ZygoConnected(); // 122
-	CString Instrument_Measure(BOOL bWait); // 532
-	void Instrument_AutoFocus(); // 551
-	void Instrument_MoveTurret(int position); // 562
-	void Instrument_SetZoom(double nZoom); // 572
-	void Instrument_SetLightLevel(double dlightLevel); // 582
-	void Instrument_AutoLightLevel(); // 554
-	double Instrument_GetLightLevel(); // 581
-	void Motion_Home(int nZygoAxis, BOOL bWait); // 811
-	double Motion_GetZPos(); // 835
-	CString Motion_MoveZ(double dPos); // 825
-	BOOL Motion_IsZStopSet(); // 871
+	//BOOL IsReturn();
+	//void SetReturn(CString str);
 
 public:
 	CZygo(CWnd* pParent = NULL, CString sSvrAddr = ZYGO_ADDR, CString sSvrPort = ZYGO_PORT);
 	virtual ~CZygo();
 
 public:
+	//void ClearReturn();
 	BOOL IsConnected();
 
 	BOOL IsConnectedMainUI();  // 122
@@ -74,7 +62,7 @@ public:
 	BOOL IsZStopSet();    // 871
 
 public:
-	void OnDataReceived(BYTE* pBuffer, DWORD dwCount);
+	//void OnDataReceived(BYTE* pBuffer, DWORD dwCount);
 
 protected:
 	afx_msg LRESULT wmClientReceived(WPARAM wParam, LPARAM lParam);

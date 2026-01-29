@@ -188,7 +188,16 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Zygo.h" />
-    <ClInclude Include="ZygoClient.h" />
+    <ClInclude Include="ZygoEnumerations.h" />
+    <ClInclude Include="ZygoInstrumentService.h" />
+    <ClInclude Include="ZygoMasksService.h" />
+    <ClInclude Include="ZygoMotionService.h" />
+    <ClInclude Include="ZygoMxClient.h" />
+    <ClInclude Include="ZygoMxService.h" />
+    <ClInclude Include="ZygoPatternService.h" />
+    <ClInclude Include="ZygoRecipeService.h" />
+    <ClInclude Include="ZygoSystemCommandsService.h" />
+    <ClInclude Include="ZygoUserInterfaceService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyZygo.cpp" />
@@ -201,7 +210,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Zygo.cpp" />
-    <ClCompile Include="ZygoClient.cpp" />
+    <ClCompile Include="ZygoInstrumentService.cpp" />
+    <ClCompile Include="ZygoMasksService.cpp" />
+    <ClCompile Include="ZygoMotionService.cpp" />
+    <ClCompile Include="ZygoMxClient.cpp" />
+    <ClCompile Include="ZygoMxService.cpp" />
+    <ClCompile Include="ZygoPatternService.cpp" />
+    <ClCompile Include="ZygoRecipeService.cpp" />
+    <ClCompile Include="ZygoSystemCommandsService.cpp" />
+    <ClCompile Include="ZygoUserInterfaceService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MyZygo.rc" />
