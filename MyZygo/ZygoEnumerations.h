@@ -521,8 +521,7 @@ namespace ZygoEnumerations
 		Align = 1,
 		View = 2
 	};
-
-
+	
 	typedef enum DmiStatus
 	{
 		NoError = 0,
