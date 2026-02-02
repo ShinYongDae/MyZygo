@@ -551,6 +551,17 @@ namespace ZygoEnumerations
 		MotionPositionNotUpdated = 8388608,
 		MotionFault = 16777216
 	};
+
+	typedef enum DialogMode
+	{
+		MessageOk = 1,
+		ErrorOk = 2,
+		WarningOk = 3,
+		ConfirmYesNo = 4,
+		ErrorOkCancel = 5,
+		WarningYesNo = 6,
+		MessageOkCancel = 7
+	}
 }
 
 namespace ZygoEnumeration
