@@ -14,6 +14,7 @@
 #include "ZygoRecipeService.h"
 #include "ZygoSystemCommandsService.h"
 #include "ZygoUserInterfaceService.h"
+#include "ZygoUserFunctionService.h"
 
 using namespace ZygoEnumeration;
 using namespace ZygoEnumerations;
@@ -47,6 +48,20 @@ class CZygoMxClient //: public CWnd
 	void ThreadStop();
 	void ClearReadBuffer();
 
+	void ClassMxClient(int nGroup, int nItem, CPacket packetData, int nSizePacketData);					// Class 1
+	void ClassCore(int nGroup, int nItem, CPacket packetData, int nSizePacketData); 					// Class 2
+	void ClassEnumerations(int nGroup, int nItem, CPacket packetData, int nSizePacketData); 			// Class 3
+	void ClassMxService(int nGroup, int nItem, CPacket packetData, int nSizePacketData); 				// Class 4
+	void ClassInstrumentService(int nGroup, int nItem, CPacket packetData, int nSizePacketData); 		// Class 5
+	void ClassMasksService(int nGroup, int nItem, CPacket packetData, int nSizePacketData); 			// Class 6
+	void ClassFiducialsService(int nGroup, int nItem, CPacket packetData, int nSizePacketData); 		// Class 7
+	void ClassMotionService(int nGroup, int nItem, CPacket packetData, int nSizePacketData); 			// Class 8
+	void ClassPatternService(int nGroup, int nItem, CPacket packetData, int nSizePacketData);			// Class 9
+	void ClassRecipeService(int nGroup, int nItem, CPacket packetData, int nSizePacketData);			// Class 10
+	void ClassSystemCommandsService(int nGroup, int nItem, CPacket packetData, int nSizePacketData);	// Class 11
+	void ClassUserInterfaceService(int nGroup, int nItem, CPacket packetData, int nSizePacketData);		// Class 12
+	void ClassUserFunctionService(int nGroup, int nItem, CPacket packetData, int nSizePacketData);		// Class 13
+
 private:
 	void OnDataReceived(BYTE* pBuffer, DWORD dwCount);
 	void PacketParsing(CPacket packet, int nSize);
@@ -63,6 +78,7 @@ public:
 	CZygoRecipeService* Recipe;
 	CZygoSystemCommandsService* SystemCommands;
 	CZygoUserInterfaceService* UserInterface;
+	CZygoUserFunctionService* UserFunction;
 	
 	void SetReturn(CString str);
 	BOOL IsReturn();

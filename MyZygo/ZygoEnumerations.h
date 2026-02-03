@@ -561,7 +561,7 @@ namespace ZygoEnumerations
 		ErrorOkCancel = 5,
 		WarningYesNo = 6,
 		MessageOkCancel = 7
-	}
+	};
 }
 
 namespace ZygoEnumeration

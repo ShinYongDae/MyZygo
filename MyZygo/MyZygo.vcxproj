@@ -197,6 +197,7 @@
     <ClInclude Include="ZygoPatternService.h" />
     <ClInclude Include="ZygoRecipeService.h" />
     <ClInclude Include="ZygoSystemCommandsService.h" />
+    <ClInclude Include="ZygoUserFunctionService.h" />
     <ClInclude Include="ZygoUserInterfaceService.h" />
   </ItemGroup>
   <ItemGroup>
@@ -218,6 +219,7 @@
     <ClCompile Include="ZygoPatternService.cpp" />
     <ClCompile Include="ZygoRecipeService.cpp" />
     <ClCompile Include="ZygoSystemCommandsService.cpp" />
+    <ClCompile Include="ZygoUserFunctionService.cpp" />
     <ClCompile Include="ZygoUserInterfaceService.cpp" />
   </ItemGroup>
   <ItemGroup>
