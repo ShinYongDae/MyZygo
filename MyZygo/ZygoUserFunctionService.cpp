@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "ZygoMxClient.h"
 #include "ZygoUserFunctionService.h"
 
 

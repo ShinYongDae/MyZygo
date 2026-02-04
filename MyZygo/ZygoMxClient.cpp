@@ -409,6 +409,16 @@ CString CZygoMxClient::GetReturnString(BOOL bWait)
 	return sRtn;
 }
 
+float CZygoMxClient::GetReturnFloat(BOOL bWait)
+{
+	float fRtn = 0.0;
+	if (!bWait)	return fRtn;
+
+	if (GetReturn(bWait))
+		fRtn = _ttof(m_sReturn);
+	return fRtn;
+}
+
 double CZygoMxClient::GetReturnDouble(BOOL bWait)
 {
 	double dRtn = 0.0;
@@ -417,6 +427,26 @@ double CZygoMxClient::GetReturnDouble(BOOL bWait)
 	if (GetReturn(bWait))
 		dRtn = _ttof(m_sReturn);
 	return dRtn;
+}
+
+int CZygoMxClient::GetReturnInt(BOOL bWait)
+{
+	int nRtn = -1;
+	if (!bWait)	return nRtn;
+
+	if (GetReturn(bWait))
+		nRtn = _ttoi(m_sReturn);
+	return nRtn;
+}
+
+long CZygoMxClient::GetReturnLong(BOOL bWait)
+{
+	long lRtn = -1;
+	if (!bWait)	return lRtn;
+
+	if (GetReturn(bWait))
+		lRtn = _ttol(m_sReturn);
+	return lRtn;
 }
 
 BOOL CZygoMxClient::ZygoConnected() // 122

@@ -41,9 +41,6 @@ class CZygoMxClient //: public CWnd
 	//BOOL CreateWndForm(DWORD dwStyle);
 	BOOL CreateService();
 
-	void StringToChar(CString str, char* szStr);
-	void StringToTChar(CString str, TCHAR* tszStr);
-	CString CharToString(char *szStr);
 	void ThreadStart();
 	void ThreadStop();
 	void ClearReadBuffer();
@@ -85,7 +82,10 @@ public:
 	void ClearReturn();
 	BOOL GetReturn(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
 	BOOL GetReturnBool(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	float GetReturnFloat(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
 	double GetReturnDouble(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	int GetReturnInt(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
+	long GetReturnLong(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
 	CString GetReturnString(BOOL bWait);	// bWait : 응답이 있을 때 까지 대기
 	BOOL ZygoConnected(); // 122
 
@@ -100,6 +100,11 @@ public:
 	BOOL Send(char* pBuffer, int nLen);
 	BOOL ThreadIsAlive();
 	BOOL IsConnected();
+
+public:
+	void StringToChar(CString str, char* szStr);
+	void StringToTChar(CString str, TCHAR* tszStr);
+	CString CharToString(char *szStr);
 
 protected:
 	void ThreadEnd();

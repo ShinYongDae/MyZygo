@@ -6,5 +6,8 @@ class CZygoMasksService
 public:
 	CZygoMasksService(void* pParent = NULL);
 	~CZygoMasksService();
+
+public:
+
 };
 

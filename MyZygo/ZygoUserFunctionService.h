@@ -6,5 +6,8 @@ class CZygoUserFunctionService
 public:
 	CZygoUserFunctionService(void* pParent = NULL);
 	~CZygoUserFunctionService();
+
+public:
+
 };
 
