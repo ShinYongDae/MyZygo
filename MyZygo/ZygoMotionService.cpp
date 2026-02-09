@@ -24,7 +24,7 @@ void CZygoMotionService::Home(int nZygoAxis, BOOL bWait) // 811
 	packet << (byte)8; packet << (byte)1; packet << (byte)1;
 	packet << _nZygoAxis; packet << _wait; packet << (byte)0; // NULL(for end)
 	int nLen = 5 * sizeof(byte) + sizeof(INT32);
-	pMxClient->Send((char*)packet.GetData(), nLen);
+	CString str = pMxClient->GetReturnString(pMxClient->Send((char*)packet.GetData(), nLen));
 }
 
 double CZygoMotionService::GetZPos() // 835

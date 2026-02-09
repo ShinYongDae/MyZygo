@@ -32,6 +32,8 @@ class CMyZygoDlg : public CDialog
 	void LoadConfig();
 	void CheckZygoStatus();
 
+	void DispZoom(double dZoom);
+
 // 생성입니다.
 public:
 	CMyZygoDlg(CWnd* pParent = NULL);	// 표준 생성자입니다.
@@ -71,12 +73,12 @@ public:
 	afx_msg void OnBnClickedButtonAf();
 	afx_msg void OnNcDestroy();
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnBnClickedButtonHalfx();
-	afx_msg void OnBnClickedButton1x();
-	afx_msg void OnBnClickedButton2x();
 	afx_msg void OnBnClickedButtonManualChange();
 	afx_msg void OnBnClickedButtonAutolight();
 	afx_msg void OnBnClickedButtonStartMeasure();
 	afx_msg void OnBnClickedButtonHomming();
 	afx_msg void OnBnClickedButtonGoPos();
+	afx_msg void OnBnClickedCheckHalfx();
+	afx_msg void OnBnClickedCheck1x();
+	afx_msg void OnBnClickedCheck2x();
 };

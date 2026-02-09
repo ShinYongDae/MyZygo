@@ -134,14 +134,14 @@ BEGIN_MESSAGE_MAP(CMyZygoDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_AF, &CMyZygoDlg::OnBnClickedButtonAf)
 	ON_WM_NCDESTROY()
 	ON_WM_CREATE()
-	ON_BN_CLICKED(IDC_BUTTON_HALFX, &CMyZygoDlg::OnBnClickedButtonHalfx)
-	ON_BN_CLICKED(IDC_BUTTON_1X, &CMyZygoDlg::OnBnClickedButton1x)
-	ON_BN_CLICKED(IDC_BUTTON_2X, &CMyZygoDlg::OnBnClickedButton2x)
 	ON_BN_CLICKED(IDC_BUTTON_MANUAL_CHANGE, &CMyZygoDlg::OnBnClickedButtonManualChange)
 	ON_BN_CLICKED(IDC_BUTTON_AUTOLIGHT, &CMyZygoDlg::OnBnClickedButtonAutolight)
 	ON_BN_CLICKED(IDC_BUTTON_START_MEASURE, &CMyZygoDlg::OnBnClickedButtonStartMeasure)
 	ON_BN_CLICKED(IDC_BUTTON_HOMMING, &CMyZygoDlg::OnBnClickedButtonHomming)
 	ON_BN_CLICKED(IDC_BUTTON_GO_POS, &CMyZygoDlg::OnBnClickedButtonGoPos)
+	ON_BN_CLICKED(IDC_CHECK_HALFX, &CMyZygoDlg::OnBnClickedCheckHalfx)
+	ON_BN_CLICKED(IDC_CHECK_1X, &CMyZygoDlg::OnBnClickedCheck1x)
+	ON_BN_CLICKED(IDC_CHECK_2X, &CMyZygoDlg::OnBnClickedCheck2x)
 END_MESSAGE_MAP()
 
 
@@ -355,8 +355,19 @@ void CMyZygoDlg::LoadConfig()
 
 void CMyZygoDlg::InitDlg()
 {
+	((CButton*)GetDlgItem(IDC_CHECK_MOVING_ABS))->SetCheck(TRUE);
 	GetDlgItem(IDC_EDIT_LIGHT_LEVEL)->SetWindowText(m_sLightDN);
 	InitComboTurret();
+
+	CComboBox* pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_ZYGO_LENS_TURRET);
+
+	if (m_pZygo)
+	{
+		int nCurrTurret = m_pZygo->GetTurret(); // 561
+		int nPrevTurret = pCombo->SetCurSel(nCurrTurret-1);
+		double dZoom = m_pZygo->GetZoom(); // 572
+		DispZoom(dZoom);
+	}
 }
 
 void CMyZygoDlg::InitComboTurret()
@@ -386,7 +397,8 @@ void CMyZygoDlg::CheckZygoStatus()
 		{
 			if (m_bDlg && (bConnectedServer = m_pZygo->IsConnected()))
 				if (m_bDlg) pChk0->SetCheck(TRUE);
-			else if (m_bDlg) pChk0->SetCheck(FALSE);
+			else if (m_bDlg) 
+				if (m_bDlg) pChk0->SetCheck(FALSE);
 				
 		}
 
@@ -394,7 +406,8 @@ void CMyZygoDlg::CheckZygoStatus()
 		{
 			if (m_bDlg && (bConnectedZygo = m_pZygo->IsConnectedMainUI())) // 122
 				if (m_bDlg) pChk1->SetCheck(TRUE);
-			else if (m_bDlg) pChk1->SetCheck(FALSE);
+			else if (m_bDlg) 
+				if (m_bDlg) pChk1->SetCheck(FALSE);
 				
 		}
 
@@ -403,7 +416,7 @@ void CMyZygoDlg::CheckZygoStatus()
 			if (m_bDlg && bConnectedZygo)
 			{
 				double dVal = m_pZygo->GetLightLevel(); // 581
-				sRtn.Format(_T("%f", dVal));
+				sRtn.Format(_T("%.6f"), dVal);
 				if (m_bDlg) pText0->SetWindowText(sRtn);
 			}
 			else if (m_bDlg) pText0->SetWindowTextW(_T(""));
@@ -414,7 +427,7 @@ void CMyZygoDlg::CheckZygoStatus()
 			if (m_bDlg && bConnectedZygo)
 			{
 				double dVal = m_dZHomePos; // 835
-				sRtn.Format(_T("%f", dVal));
+				sRtn.Format(_T("%.6f"), m_dZHomePos);
 				if (m_bDlg) pText1->SetWindowText(sRtn);
 			}
 			else if (m_bDlg) pText1->SetWindowTextW(_T(""));
@@ -424,8 +437,9 @@ void CMyZygoDlg::CheckZygoStatus()
 		{
 			if (m_bDlg && bConnectedZygo)
 			{
-				double dVal = m_dZStopPos; // 835
-				sRtn.Format(_T("%f", dVal));
+				m_dZStopPos = m_pZygo->GetZPos(); // 835
+				//double dVal = m_dZStopPos; // 835
+				sRtn.Format(_T("%.6f"), m_dZStopPos);
 				if (m_bDlg) pText2->SetWindowText(sRtn);
 			}
 			else if (m_bDlg) pText2->SetWindowTextW(_T(""));
@@ -436,7 +450,7 @@ void CMyZygoDlg::CheckZygoStatus()
 			if (m_bDlg && bConnectedZygo)
 			{
 				double dVal = m_dZMesurePos; // 835
-				sRtn.Format(_T("%f", dVal));
+				sRtn.Format(_T("%.6f"), dVal);
 				if (m_bDlg) pText3->SetWindowText(sRtn);
 			}
 			else if (m_bDlg) pText3->SetWindowTextW(_T(""));
@@ -451,26 +465,9 @@ void CMyZygoDlg::OnSelchangeComboZygoLensTurret()
 
 	int nTypeTurret = pCombo->GetCurSel();
 	if (m_pZygo)
-		m_pZygo->MoveTurret(nTypeTurret); // 562
+		m_pZygo->MoveTurret(nTypeTurret+1); // 562
 }
 
-void CMyZygoDlg::OnBnClickedButtonHalfx()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_pZygo->SetZoom(0.5); // 572
-}
-
-void CMyZygoDlg::OnBnClickedButton1x()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_pZygo->SetZoom(1.0); // 572
-}
-
-void CMyZygoDlg::OnBnClickedButton2x()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_pZygo->SetZoom(2.0); // 572
-}
 
 void CMyZygoDlg::OnBnClickedButtonManualChange()
 {
@@ -501,7 +498,7 @@ void CMyZygoDlg::OnBnClickedButtonStartMeasure()
 		{
 			AfxMessageBox(_T("Measure Completed."));
 		}
-		//m_dZMesurePos = m_pZygo->GetZPos(); // 835
+		m_dZMesurePos = m_pZygo->GetZPos(); // 835
 		//m_pZygo->AutoFocus(); // 551
 	}
 }
@@ -510,13 +507,14 @@ void CMyZygoDlg::OnBnClickedButtonHomming()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_pZygo->HomeZ(TRUE); // 811 
-	m_dZHomePos = m_dZStopPos = m_pZygo->GetZPos(); // 835
+	m_dZHomePos = m_pZygo->GetZPos(); // 835
 }
 
 void CMyZygoDlg::OnBnClickedButtonAf()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	m_dZStopPos = m_pZygo->GetZPos(); // 835
+	m_pZygo->AutoFocus(); // 551
+	//m_dZStopPos = m_pZygo->GetZPos(); // 835
 }
 
 void CMyZygoDlg::OnBnClickedButtonGoPos()
@@ -527,5 +525,83 @@ void CMyZygoDlg::OnBnClickedButtonGoPos()
 	GetDlgItem(IDC_EDIT_MOVE_POS)->GetWindowText(sPos);
 	double dPos = _ttof(sPos);
 	CString sReturn = m_pZygo->MoveZ(dPos, bABS); // 825
-	m_dZStopPos = m_pZygo->GetZPos(); // 835
+	//m_dZStopPos = m_pZygo->GetZPos(); // 835
+}
+
+void CMyZygoDlg::DispZoom(double dZoom)
+{
+	CButton* pBtn0 = (CButton*)GetDlgItem(IDC_CHECK_HALFX);
+	CButton* pBtn1 = (CButton*)GetDlgItem(IDC_CHECK_1X);
+	CButton* pBtn2 = (CButton*)GetDlgItem(IDC_CHECK_2X);
+
+	if (dZoom > 0.4999 && dZoom < 0.5001)
+		pBtn0->SetCheck(TRUE);
+	else
+		pBtn0->SetCheck(FALSE);
+
+	if (dZoom > 0.9999 && dZoom < 1.0001)
+		pBtn1->SetCheck(TRUE);
+	else
+		pBtn1->SetCheck(FALSE);
+
+	if (dZoom > 1.9999 && dZoom < 2.0001)
+		pBtn2->SetCheck(TRUE);
+	else
+		pBtn2->SetCheck(FALSE);
+}
+
+void CMyZygoDlg::OnBnClickedCheckHalfx()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CButton* pBtn0 = (CButton*)GetDlgItem(IDC_CHECK_HALFX);
+	CButton* pBtn1 = (CButton*)GetDlgItem(IDC_CHECK_1X);
+	CButton* pBtn2 = (CButton*)GetDlgItem(IDC_CHECK_2X);
+	if (pBtn0->GetCheck())
+	{
+		m_pZygo->SetZoom(0.5); // 572
+		pBtn1->SetCheck(FALSE);
+		pBtn2->SetCheck(FALSE);
+	}
+	else
+	{
+		pBtn0->SetCheck(TRUE);
+	}
+}
+
+
+void CMyZygoDlg::OnBnClickedCheck1x()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CButton* pBtn0 = (CButton*)GetDlgItem(IDC_CHECK_HALFX);
+	CButton* pBtn1 = (CButton*)GetDlgItem(IDC_CHECK_1X);
+	CButton* pBtn2 = (CButton*)GetDlgItem(IDC_CHECK_2X);
+	if (pBtn1->GetCheck())
+	{
+		m_pZygo->SetZoom(1.0); // 572
+		pBtn0->SetCheck(FALSE);
+		pBtn2->SetCheck(FALSE);
+	}
+	else
+	{
+		pBtn1->SetCheck(TRUE);
+	}
+}
+
+
+void CMyZygoDlg::OnBnClickedCheck2x()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CButton* pBtn0 = (CButton*)GetDlgItem(IDC_CHECK_HALFX);
+	CButton* pBtn1 = (CButton*)GetDlgItem(IDC_CHECK_1X);
+	CButton* pBtn2 = (CButton*)GetDlgItem(IDC_CHECK_2X);
+	if (pBtn2->GetCheck())
+	{
+		m_pZygo->SetZoom(2.0); // 572
+		pBtn0->SetCheck(FALSE);
+		pBtn1->SetCheck(FALSE);
+	}
+	else
+	{
+		pBtn2->SetCheck(TRUE);
+	}
 }

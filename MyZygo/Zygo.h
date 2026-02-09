@@ -49,7 +49,9 @@ public:
 	BOOL IsConnectedMainUI();  // 122
 	CString Measure(BOOL bWait); // 532
 	void AutoFocus(); // 551
+	int GetTurret(); // 561
 	void MoveTurret(int nTurret); // 562
+	double GetZoom(); // 571
 	void SetZoom(double dZoom); // 572
 	double GetLightLevel(); // 581
 	void SetLightLevel(double dLightDN); // 582

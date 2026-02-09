@@ -180,6 +180,21 @@ void CZygo::AutoLightLevel() // 554
 	}
 }
 
+int CZygo::GetTurret() // 561
+{
+	int nTurret = -1;
+	if (IsConnected())
+	{
+		nTurret = m_pClient->Instrument->GetTurret(); // 561
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected.\r\n"));
+	}
+
+	return nTurret;
+}
+
 void CZygo::MoveTurret(int nTurret) // 562
 {
 	//서버 정상 여부 확인
@@ -191,6 +206,20 @@ void CZygo::MoveTurret(int nTurret) // 562
 	{
 		AfxMessageBox(_T("Zygo not Connected.\r\n"));
 	}
+}
+
+double CZygo::GetZoom() // 571
+{
+	double dZoom = 0.0;
+	if (IsConnected())
+	{
+		dZoom = m_pClient->Instrument->GetZoom(); // 571
+	}
+	else
+	{
+		AfxMessageBox(_T("Zygo not Connected."));
+	}
+	return dZoom;
 }
 
 void CZygo::SetZoom(double dZoom) // 572
